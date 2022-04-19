@@ -40,8 +40,6 @@
             :value="subject.id"/>
         </el-select>
       </el-form-item>
-
-      <!-- 课程讲师 TODO -->
       <!-- 课程讲师 -->
       <el-form-item label="课程讲师">
         <el-select
@@ -56,7 +54,6 @@
 
         </el-select>
       </el-form-item>
-
       <el-form-item label="总课时">
         <el-input-number :min="0" v-model="courseInfo.lessonNum" controls-position="right" placeholder="请填写课程的总课时数"/>
       </el-form-item>
@@ -101,6 +98,7 @@ export default {
   data() {
     return {
       saveBtnDisabled: false,
+      isUpdate: false,
       courseInfo: {
         title: '',
         subjectId: '', // 二级分类id
@@ -118,12 +116,29 @@ export default {
     }
   },
   created() {
-    // 初始化所有讲师
-    this.getListTeacher()
-    // 初始化一级分类
-    this.getOneSubject()
+    this.init()
   },
   methods: {
+    init() {
+      if (this.$route.params && this.$route.params.id) {
+        const id = this.$route.params.id
+        // 根据id获取课程基本信息
+        this.fetchCourseInfoById(id)
+      } else {
+        this.getListTeacher()
+        this.getOneSubject()
+      }
+    },
+    fetchCourseInfoById(id) {
+      course.getCourseInfo(id).then(response => {
+        this.courseInfo = response.data.data
+      }).catch((response) => {
+        this.$message({
+          type: 'error',
+          message: response.message
+        })
+      })
+    },
     // 上传封面成功调用的方法
     handleAvatarSuccess(res, file) {
       this.courseInfo.cover = res.data.url
@@ -173,8 +188,21 @@ export default {
         })
     },
     saveOrUpdate() {
-      course.saveCourseInfo(this.courseInfo)
-        .then(response => {
+      if (this.isUpdate) {
+        console.log('update')
+        course.updateCourseInfo(this.courseInfo)
+          .then(response => {
+          // 提示
+            this.$message({
+              type: 'success',
+              message: '修改课程信息成功!'
+            })
+            // 跳转到第二步
+            this.$router.push({ path: '/course/chapter/' + response.data.courseId })
+          })
+      } else {
+        console.log('save')
+        course.saveCourseInfo(this.courseInfo).then(response => {
           // 提示
           this.$message({
             type: 'success',
@@ -183,6 +211,25 @@ export default {
           // 跳转到第二步
           this.$router.push({ path: '/course/chapter/' + response.data.courseId })
         })
+      }
+      this.isUpdate = true
+    },
+    updateData() {
+      this.saveBtnDisabled = true
+      course.updateCourseInfo(this.courseInfo).then(response => {
+        this.$message({
+          type: 'success',
+          message: '修改成功!'
+        })
+        return response// 将响应结果传递给then
+      }).then(response => {
+        this.$router.push({ path: '/course/chapter/' + response.data.courseId })
+      }).catch((response) => {
+        this.$message({
+          type: 'error',
+          message: '保存失败'
+        })
+      })
     }
   }
 }
