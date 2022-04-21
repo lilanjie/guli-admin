@@ -31,33 +31,6 @@
               <el-button type="text" @click="addVideo(); chapterId = chapter.id">添加课时</el-button>
               <el-button type="text" @click="editChapter(chapter.id)">编辑</el-button>
               <el-button type="text" @click="removeChapter(chapter.id)">删除</el-button>
-              <!-- 添加和修改课时表单 -->
-              <el-dialog :visible.sync="dialogVideoFormVisible" title="添加课时">
-                <el-form :model="video" label-width="120px">
-                  <el-form-item label="课时标题">
-                    <el-input v-model="video.title"/>
-                  </el-form-item>
-                  <el-form-item label="课时排序">
-                    <el-input-number v-model="video.sort" :min="0" controls-position="right"/>
-                  </el-form-item>
-                  <el-form-item label="是否免费">
-                    <el-radio-group v-model="video.free">
-                      <el-radio :label="true">免费</el-radio>
-                      <el-radio :label="false">默认</el-radio>
-                    </el-radio-group>
-                  </el-form-item>
-                  <el-form-item label="上传视频">
-                    <!-- TODO -->
-                  </el-form-item>
-                </el-form>
-                <div slot="footer" class="dialog-footer">
-                  <el-button @click="helpSaveVideo()">取 消</el-button>
-                  <el-button
-                    :disabled="saveVideoBtnDisabled"
-                    type="primary"
-                    @click="saveOrUpdateVideo">确 定</el-button>
-                </div>
-              </el-dialog>
             </span>
           </p>
           <!-- 视频 -->
@@ -75,6 +48,33 @@
           </ul>
         </li>
       </ul>
+      <!-- 添加和修改课时表单 -->
+      <el-dialog :visible.sync="dialogVideoFormVisible" title="添加课时">
+        <el-form :model="video" label-width="120px">
+          <el-form-item label="课时标题">
+            <el-input v-model="video.title"/>
+          </el-form-item>
+          <el-form-item label="课时排序">
+            <el-input-number v-model="video.sort" :min="0" controls-position="right"/>
+          </el-form-item>
+          <el-form-item label="是否免费">
+            <el-radio-group v-model="video.isFree">
+              <el-radio :label="1">免费</el-radio>
+              <el-radio :label="0">默认</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="上传视频">
+            <!-- TODO -->
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogVideoFormVisible = false">取 消</el-button>
+          <el-button
+            :disabled="saveVideoBtnDisabled"
+            type="primary"
+            @click="saveOrUpdateVideo">确 定</el-button>
+        </div>
+      </el-dialog>
       <el-form-item>
         <el-button @click="previous">上一步</el-button>
         <el-button :disabled="saveBtnDisabled" type="primary" @click="next">下一步</el-button>
@@ -104,7 +104,7 @@ export default {
       video: {// 课时对象
         title: '',
         sort: 0,
-        free: 0,
+        isFree: 0,
         videoSourceId: ''
       }
     }
@@ -247,6 +247,7 @@ export default {
       this.dialogVideoFormVisible = true
       video.getVideoInfoById(videoId).then(response => {
         this.video = response.data.data
+        console.log(this.video)
       })
     },
     removeVideo(videoId) {
