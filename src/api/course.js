@@ -23,14 +23,27 @@ export default {
   },
   getCoursePublishInfoById(id) {
     return request({
-      url: `${api_name}/course-publish-info/${id}`,
+      url: `${api_name}/publish/${id}`,
       method: 'get'
     })
   },
   publishCourse(id) {
     return request({
-      url: `${api_name}/publish-course/${id}`,
+      url: `${api_name}/publish/${id}`,
       method: 'put'
+    })
+  },
+  getPageList(page, limit, searchObj) {
+    return request({
+      url: `${api_name}/${page}/${limit}`,
+      method: 'get',
+      params: searchObj
+    })
+  },
+  removeById(id) {
+    return request({
+      url: `${api_name}/${id}`,
+      method: 'delete'
     })
   }
 
