@@ -66,6 +66,7 @@
               <p>{{ scope.row.lessonNum }} </p>
             </div>
           </div>
+
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center">
